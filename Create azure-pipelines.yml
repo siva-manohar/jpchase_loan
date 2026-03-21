@@ -1,0 +1,35 @@
+trigger:
+  branches:
+    include:
+      - main
+      - staging
+
+pr:
+  branches:
+    include:
+      - main
+      - staging
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '18.x'
+
+- script: |
+    npm install sfdx-cli --global
+  displayName: 'Install Salesforce CLI'
+
+- script: |
+    sfdx auth:sfdxurl:store -f $(SFDX_AUTH_URL) -a targetOrg
+  displayName: 'Authenticate Salesforce Org'
+
+- script: |
+    if [ "$(Build.SourceBranchName)" == "staging" ]; then
+      sfdx force:source:deploy -p force-app -u targetOrg
+    elif [ "$(Build.SourceBranchName)" == "main" ]; then
+      sfdx force:source:deploy -p force-app -u targetOrg
+    fi
+  displayName: 'Deploy Based on Branch'

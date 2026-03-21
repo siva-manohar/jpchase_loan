@@ -23,7 +23,11 @@ steps:
   displayName: 'Install Salesforce CLI'
 
 - script: |
-    sfdx auth:sfdxurl:store -f $(SFDX_AUTH_URL) -a targetOrg
+    echo "$(SFDX_AUTH_URL)" > authFile.txt
+  displayName: 'Create auth file'
+
+- script: |
+    sfdx force:auth:sfdxurl:store -f authFile.txt -a targetOrg
   displayName: 'Authenticate Salesforce Org'
 
 - script: |
